@@ -173,6 +173,60 @@ exports.play = function (req, res, next) {
     });
 };
 
+// GET /quizzes/randomplay
+exports.randomPlay = function (req, res, next) {
+
+    // Si ya se han mostrado todas las preguntas de la DB
+    if(req.session.randomplay.resolved.length == Quiz.count()){
+        res.render('quizzes/random_nomore', {
+            score: req.session.randomplay.score
+        });
+    }
+    else{
+
+    // Id random entre 0 y el numero de preguntas totales en la DB
+    var randomId = Math.random()* Quiz.count();
+
+    //Comprobamos que el array de preguntas propuestas no está vacio
+    var used = req.session.randomplay.resolved.length ? req.session.randomplay.resolved: [-1];
+
+    //Compruebo que el id random que paso no ha sido ya pasado y resuelto el quiz por el usuario
+    var whereOpt =  {'randomId':{$notIn: used}};
+
+    // Añado el id random elegido al array de preguntas propuestas para no repetirla
+            req.session.randomplay.resolved.randomId;
+
+    //Muestro la pagina con la pregunta aleatoria
+    res.render('quizzes/randomplay', {
+        quiz: models.Quiz.findAll({where:whereOpt},1),
+        score: req.session.randomplay.score
+    });
+
+    }
+};
+
+
+// GET  /quizzes/randomcheck/:quizId?answer=respuesta
+exports.randomCheck = function (req, res, next) {
+
+
+    var answer = req.query.answer || "";
+
+    var result = answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim();
+
+    if(result) {
+        // Sumo +1 el numero de preguntas acertadas
+        req.session.randomplay.score++;
+    }
+
+    res.render('quizzes/result', {
+        quiz: req.quiz,
+        result: result,
+        answer: answer,
+        score: req.session.randomplay.score
+    });
+};
+
 
 // GET /quizzes/:quizId/check
 exports.check = function (req, res, next) {
