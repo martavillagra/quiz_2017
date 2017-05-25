@@ -30,7 +30,6 @@ app.use(methodOverride('_method', {methods: ["POST", "GET"]}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(partials());
 app.use(flash());
-
 app.use('/', index);
 
 // catch 404 and forward to error handler
