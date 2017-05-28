@@ -173,6 +173,52 @@ exports.play = function (req, res, next) {
     });
 };
 
+//GET /quizzes/randomplay
+exports.randomplay = function (req, res, next) {
+
+    var answer = req.query.answer || '';
+    if(!req.session.p52){
+	req.session.p52 = { yaPreguntadas : [-1] }; //creo un nuevo atributo que es un aarray con las ya preguntadas
+    }
+
+    models.Quiz.count({where : {'id': {$notIn: yaPreguntadas}}}) //me da el numero de preguntas que no he hecho, las que me quedan por responder
+    .then(function (numNoPreguntadas){
+	var aleatoria = Math.floor(Math.random()*numNoPreguntadas); //num entre 0 y las que me quedan por responder 
+	return models.findAll({
+		limit: 1, //para que me devuelva solo una
+		offset: aleatoria, //que me de el numero del array que he calculado aleatoriamente 
+		where:  {'id': {$notIn: yaPreguntadas}} //para que busque solo entre las que me quedan, no las he hecho
+	});
+    })
+    .then(function (arrayQuiz){ //array con la siguiente pregunta a hacer
+	if(arrayQuiz.length === 0){ //si no hay ninguna es que ya he respondido a todas 
+		res.render('quizzes/random_nomore', { score: yaPreguntadas.length });
+	} else {
+		res.render('quizzes/random_play', { 
+			score : yaPreguntadas.length,
+			quiz: arrayQuiz[0]
+		});
+	}
+    .catch(function (error) {
+	req.flash('error', 'Error al buscar los Quiz: ' + error.message);
+        next(error);
+    });
+};
+
+//GET /quizzes/randomcheck/:quizId?answer=respuesta
+exports.randomcheck = function (req, res, next) {
+
+    var answer = req.query.answer || '';
+    var result = answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim();
+
+    res.render('quizzes/random_result', {
+	score: req.session.p52.yaPreguntadas.length,
+	answer: answer,
+	result: result,
+	quiz: req.quiz
+   });
+};
+
 
 // GET /quizzes/:quizId/check
 exports.check = function (req, res, next) {
