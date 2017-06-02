@@ -181,7 +181,7 @@ exports.randomPlay = function (req, res, next) {
 // DEBUG!!!
     res.render('quizzes/random_play',{
         quiz: array_quizzes[0],
-        score: req.session.resolved.length -1}
+        score: req.session.resolved.length -1});
 
 
 
