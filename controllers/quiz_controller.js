@@ -178,6 +178,13 @@ exports.play = function (req, res, next) {
 // GET /quizzes/randomplay
 exports.randomPlay = function (req, res, next) {
 
+// DEBUG!!!
+    res.render('quizzes/random_play',{
+        quiz: array_quizzes[0],
+        score: req.session.resolved.length -1}
+
+
+
         if(!req.session.resolved){
              req.session.resolved = [ -1];
         } // hay que crearlo o vale ocn la sentencia used?
