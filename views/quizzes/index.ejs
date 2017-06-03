@@ -18,7 +18,7 @@
             <a href="/quizzes/<%= quiz.id %>/play"><%= quiz.question %></a>
         </td>
         <td colspan="2">
-            <small> (by <%= quiz.Author ? quiz.Author.username : "Anómino" %>) </small>
+            <small> (by <%= quiz.Author ? quiz.Author.username : "Anónimo" %>) </small>
         </td>
 
         <% if (session.user) { %>

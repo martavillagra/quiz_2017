@@ -10,7 +10,7 @@ exports.load = function (req, res, next, quizId) {
 
     models.Quiz.findById(quizId, {
         include: [
-            models.Tip,
+            {model: models.Tip, include:[{model:models.User,as:'Author'}]},
             {model: models.User, as: 'Author'}
         ]
     })
@@ -215,15 +215,12 @@ exports.randomPlay = function (req, res, next) {
 
         if(!req.session.resolved){
              req.session.resolved = [-1 ];
-             var score = 0;
-
+            var score = 0;
         }
-
-        //Comprobamos que el array de preguntas propuestas no está vacio
-       // var used = req.session.resolved[];//? req.session.resolved: [-1];
         //Compruebo que el id random que paso no ha sido ya pasado y resuelto el quiz por el usuario
         var whereOpt =  {id:{$notIn: req.session.resolved}};
-         score = req.session.resolved.length -1;
+
+        score = req.session.resolved.length -1;
         models.Quiz.count({where: whereOpt})
             .then(function(c){ // c es el numero de preguntas que me quedan
                 // numero aleatorio entre 0 y el numero de respuestas que me quedan (sin incluir)
@@ -234,7 +231,7 @@ exports.randomPlay = function (req, res, next) {
             })
             .then(function (array_quizzes) {
                 if (array_quizzes.length ==0){// Si ya se han mostrado todas las preguntas de la DB
-                    req.session.resolved =[-1];
+                    delete req.session.resolved;
                     res.render('quizzes/random_nomore',{
                         score: score
                     })
@@ -265,6 +262,7 @@ exports.randomCheck = function (req, res, next) {
        req.session.resolved.push(req.quiz.id);
        var score = req.session.resolved.length-1;
     } else{
+        delete req.session.resolved;
         var score = 0;
     }
 
