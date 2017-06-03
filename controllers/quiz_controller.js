@@ -178,23 +178,17 @@ exports.play = function (req, res, next) {
 // GET /quizzes/randomplay
 exports.randomPlay = function (req, res, next) {
 
-// DEBUG!!!
-    res.render('quizzes/random_play',{
-        quiz: array_quizzes[0],
-        score: req.session.resolved.length -1});
-
-
-
         if(!req.session.resolved){
-             req.session.resolved = [ -1];
-        } // hay que crearlo o vale ocn la sentencia used?
+             req.session.resolved = [-1 ];
+             var score = 0;
+
+        }
 
         //Comprobamos que el array de preguntas propuestas no está vacio
-        var used = req.session.resolved.length ? req.session.resolved: [-1];
-
+       // var used = req.session.resolved[];//? req.session.resolved: [-1];
         //Compruebo que el id random que paso no ha sido ya pasado y resuelto el quiz por el usuario
-        var whereOpt =  {id:{$notIn: used}};
-
+        var whereOpt =  {id:{$notIn: req.session.resolved}};
+         score = req.session.resolved.length -1;
         models.Quiz.count({where: whereOpt})
             .then(function(c){ // c es el numero de preguntas que me quedan
                 // numero aleatorio entre 0 y el numero de respuestas que me quedan (sin incluir)
@@ -204,60 +198,47 @@ exports.randomPlay = function (req, res, next) {
                 return models.Quiz.findAll({where:whereOpt,limit:1, offset:randomNumber}) // array_quizzes
             })
             .then(function (array_quizzes) {
-                if (array_quizzes.length ==0){ // Si ya se han mostrado todas las preguntas de la DB
+                if (array_quizzes.length ==0){// Si ya se han mostrado todas las preguntas de la DB
+                    req.session.resolved =[-1];
                     res.render('quizzes/random_nomore',{
-                        score: req.session.resolved.length -1
+                        score: score
                     })
                 }
 
                 else{
                     res.render('quizzes/random_play',{
                         quiz: array_quizzes[0],
-                        score: req.session.resolved.length -1
+                        score: score
                     })
                 }
             })
 
-        ////////////////////////////////////
-
-    // // Id random entre 0 y el numero de preguntas totales en la DB
-    // var randomId = Math.random()* models.Quiz.count();
-    //
-    // //Comprobamos que el array de preguntas propuestas no está vacio
-    // var used = req.session.randomplay.resolved.length ? req.session.randomplay.resolved: [-1];
-    //
-    // //Compruebo que el id random que paso no ha sido ya pasado y resuelto el quiz por el usuario
-    // var whereOpt =  {id:{$notIn: used}};
-    //
-    // // Añado el id random elegido al array de preguntas propuestas para no repetirla
-    //         req.session.randomplay.resolved.id;
-    //
-    // //Muestro la pagina con la pregunta aleatoria
-    // res.render('quizzes/random_play', {
-    //     quiz: models.Quiz.findAll({where:whereOpt},1),
-    //     score: req.session.randomplay.resolved.length
-    // });
-
-    //}
 };
 
 
 // GET  /quizzes/randomcheck/:quizId?answer=respuesta
 exports.randomCheck = function (req, res, next) {
 
-    var answer = req.query.answer || "";
 
-    var result = answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim();
+   var answer = req.query.answer || "";
+
+   var result = (answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim());
+
 
     // Añado el id al array de preguntas acertadas
-    req.session.resolved.push(req.param.quizId);
+    if (result){
+       req.session.resolved.push(req.quiz.id);
+       var score = req.session.resolved.length-1;
+    } else{
+        var score = 0;
+    }
 
 
     res.render('quizzes/random_result', {
-        quiz: req.quiz,
-        result: result,
+        //quiz: req.quiz,
+        score: score,
         answer: answer,
-        score: req.session.resolved.length-1
+        result: result
     });
 };
 

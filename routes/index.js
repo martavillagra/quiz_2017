@@ -28,12 +28,12 @@ router.get('/quizzes/:quizId(\\d+)/edit',  quizController.edit);
 router.put('/quizzes/:quizId(\\d+)',       quizController.update);
 router.delete('/quizzes/:quizId(\\d+)',    quizController.destroy);
 
-router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
-router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
+//router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
+//router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
 
 // Juego aleatorio
 router.get('/quizzes/randomplay', quizController.randomPlay);
-router.get('/quizzes/randomcheck/:quizId?answer=respuesta', quizController.randomCheck);
+router.get('/quizzes/randomcheck/:quizId', quizController.randomCheck);
 
 // Pagina de ayuda
 router.get('/help', function(req, res, next) {
