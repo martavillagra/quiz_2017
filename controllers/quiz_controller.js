@@ -177,7 +177,7 @@ exports.play = function (req, res, next) {
 exports.randomplay = function (req, res, next) {
 
     var answer = req.query.answer || '';
-    if(!req.session.p52){
+    if(!req.session.p52 || !req.session.p52.yaPreguntadas){
 	req.session.p52 = { yaPreguntadas : [-1] }; //creo un nuevo atributo que es un array con las ya preguntadas
     }
 
@@ -192,7 +192,10 @@ exports.randomplay = function (req, res, next) {
     })
     .then(function (arrayQuiz){ //array con la siguiente pregunta a hacer
 	if(arrayQuiz.length === 0){ //si no hay ninguna es que ya he respondido a todas 
-		res.render('quizzes/random_nomore', { score: req.session.p52.yaPreguntadas.length });
+ 		var score = req.session.p52.yaPreguntadas.length-1;
+		delete req.session.p52.yaPreguntadas;
+		res.render('quizzes/random_nomore', { score: score });
+
 	} else {
 		res.render('quizzes/random_play', { 
 			score : req.session.p52.yaPreguntadas.length -1,
@@ -211,10 +214,18 @@ exports.randomcheck = function (req, res, next) {
 
     var answer = req.query.answer || '';
     var result = answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim();
-    req.session.p52.yaPreguntadas.push(req.quiz.id);
+    var score = 0;
+    if(result){	
+	req.session.p52.yaPreguntadas.push(req.quiz.id);
+	score= req.session.p52.yaPreguntadas.length-1;
+    } else {
+	score= 0;
+	delete req.session.p52.yaPreguntadas;
+    }
+	
 
     res.render('quizzes/random_result', {
-	score: req.session.p52.yaPreguntadas.length-1,
+	score: score,
 	answer: answer,
 	result: result,
 	quiz: req.quiz
