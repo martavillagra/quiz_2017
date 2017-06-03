@@ -3,6 +3,8 @@ var Sequelize = require('sequelize');
 
 var paginate = require('../helpers/paginate').paginate;
 
+
+
 // Autoload el quiz asociado a :quizId
 exports.load = function (req, res, next, quizId) {
 
@@ -205,6 +207,73 @@ exports.play = function (req, res, next) {
     res.render('quizzes/play', {
         quiz: req.quiz,
         answer: answer
+    });
+};
+
+// GET /quizzes/randomplay
+exports.randomPlay = function (req, res, next) {
+
+        if(!req.session.resolved){
+             req.session.resolved = [-1 ];
+             var score = 0;
+
+        }
+
+        //Comprobamos que el array de preguntas propuestas no está vacio
+       // var used = req.session.resolved[];//? req.session.resolved: [-1];
+        //Compruebo que el id random que paso no ha sido ya pasado y resuelto el quiz por el usuario
+        var whereOpt =  {id:{$notIn: req.session.resolved}};
+         score = req.session.resolved.length -1;
+        models.Quiz.count({where: whereOpt})
+            .then(function(c){ // c es el numero de preguntas que me quedan
+                // numero aleatorio entre 0 y el numero de respuestas que me quedan (sin incluir)
+                var randomNumber = Math.floor(Math.random()*c);
+
+                // la promesa1 devuelve array_quizzes (realmente es 1) a la promesa2
+                return models.Quiz.findAll({where:whereOpt,limit:1, offset:randomNumber}) // array_quizzes
+            })
+            .then(function (array_quizzes) {
+                if (array_quizzes.length ==0){// Si ya se han mostrado todas las preguntas de la DB
+                    req.session.resolved =[-1];
+                    res.render('quizzes/random_nomore',{
+                        score: score
+                    })
+                }
+
+                else{
+                    res.render('quizzes/random_play',{
+                        quiz: array_quizzes[0],
+                        score: score
+                    })
+                }
+            })
+
+};
+
+
+// GET  /quizzes/randomcheck/:quizId?answer=respuesta
+exports.randomCheck = function (req, res, next) {
+
+
+   var answer = req.query.answer || "";
+
+   var result = (answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim());
+
+
+    // Añado el id al array de preguntas acertadas
+    if (result){
+       req.session.resolved.push(req.quiz.id);
+       var score = req.session.resolved.length-1;
+    } else{
+        var score = 0;
+    }
+
+
+    res.render('quizzes/random_result', {
+        //quiz: req.quiz,
+        score: score,
+        answer: answer,
+        result: result
     });
 };
 

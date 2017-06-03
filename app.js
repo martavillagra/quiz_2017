@@ -31,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(partials());
 app.use(flash());
 
+
 // Helper dinamico:
 app.use(function(req, res, next) {
 
@@ -39,6 +40,7 @@ app.use(function(req, res, next) {
 
     next();
 });
+
 
 app.use('/', index);
 

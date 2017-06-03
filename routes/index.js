@@ -89,6 +89,7 @@ router.get('/users/:userId(\\d+)/quizzes', quizController.index);     // ver las
 
 
 // Definición de rutas de /quizzes
+
 router.get('/quizzes',
     quizController.index);
 router.get('/quizzes/:quizId(\\d+)',
@@ -131,6 +132,14 @@ router.put('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)/accept',
 router.delete('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)',
     sessionController.loginRequired,
     tipController.destroy);
+
+
+//router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
+//router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
+
+// Juego aleatorio
+router.get('/quizzes/randomplay', quizController.randomPlay);
+router.get('/quizzes/randomcheck/:quizId', quizController.randomCheck);
 
 
 // Pagina de ayuda
