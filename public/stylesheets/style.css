@@ -1,7 +1,34 @@
 
 body {
-    font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: 16px "Arial Unicode MS", Helvetica, Arial, sans-serif;
     margin: 0;
+}
+
+#autor{
+    font-size: small;
+    color: #2aa198;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding-left: 1em;
+    text-indent: -.7em;
+
+}
+
+li::before {
+    content: "• ";
+    color: plum;
+}
+
+h1{
+    color: purple;
+    font-size: 24px;
 }
 
 #page {
@@ -42,10 +69,11 @@ body {
 
 #mainFooter {
     text-align: center;
+
 }
 
 a {
-    color: #00B7FF;
+    color: hotpink;
 }
 
 .right {
