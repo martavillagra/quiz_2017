@@ -4,7 +4,6 @@ var Sequelize = require('sequelize');
 var paginate = require('../helpers/paginate').paginate;
 
 
-
 // Autoload el quiz asociado a :quizId
 exports.load = function (req, res, next, quizId) {
 
@@ -220,7 +219,7 @@ exports.randomPlay = function (req, res, next) {
         //Compruebo que el id random que paso no ha sido ya pasado y resuelto el quiz por el usuario
         var whereOpt =  {id:{$notIn: req.session.resolved}};
 
-        score = req.session.resolved.length -1;
+        var score = req.session.resolved.length -1;
         models.Quiz.count({where: whereOpt})
             .then(function(c){ // c es el numero de preguntas que me quedan
                 // numero aleatorio entre 0 y el numero de respuestas que me quedan (sin incluir)
@@ -256,6 +255,10 @@ exports.randomCheck = function (req, res, next) {
 
    var result = (answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim());
 
+    if(!req.session.resolved){
+        req.session.resolved = [-1 ];
+        var score = 0;
+    }
 
     // Añado el id al array de preguntas acertadas
     if (result){
@@ -266,9 +269,8 @@ exports.randomCheck = function (req, res, next) {
         var score = 0;
     }
 
-
     res.render('quizzes/random_result', {
-        //quiz: req.quiz,
+        quiz: req.quiz,
         score: score,
         answer: answer,
         result: result

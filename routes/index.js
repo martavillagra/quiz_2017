@@ -131,8 +131,8 @@ router.delete('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)',
     tipController.destroy);
 
 
-//router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
-//router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
+router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
+router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
 
 // Juego aleatorio
 router.get('/quizzes/randomplay', quizController.randomPlay);
